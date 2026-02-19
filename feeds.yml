@@ -1,7 +1,5 @@
 # RSS Feeds to monitor
-# Each feed has a name and url
 
 feeds:
-  - name: "Example Feed"
-    url: "https://example.com/rss.xml"
-    # enabled: false  # uncomment to disable a feed
+  - name: "AI Coding"
+    url: "https://aicoding.leaflet.pub/rss"
