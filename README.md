@@ -1,6 +1,24 @@
 # RSS-to-Email Bridge 📡
 
-Monitors RSS feeds and sends digest emails when new items are published. State is stored in the repo itself (`state.json`) and committed back after each run.
+Agent-driven RSS digest system. A cron job triggers the agent, which checks feeds, generates a curated summary, and sends it via email.
+
+## How it works
+
+1. **OpenClaw cron** triggers the agent every 30 minutes
+2. Agent runs `npm run check` — fetches feeds, compares against `state.json`, writes new items to `new-items.json`
+3. Agent reads `new-items.json` and `template.html` to generate an HTML digest email
+4. Agent sends the email via `scripts/send-email.sh` (existing workspace tool)
+5. Agent commits and pushes `state.json` + clears `new-items.json`
+
+## Files
+
+| File | Purpose |
+|---|---|
+| `feeds.yml` | Subscribed feeds list |
+| `state.json` | Last-seen dates per feed (committed to repo) |
+| `new-items.json` | New items from latest check (transient) |
+| `template.html` | Email HTML template reference |
+| `src/index.js` | Feed checker script (no email logic) |
 
 ## Setup
 
@@ -8,14 +26,13 @@ Monitors RSS feeds and sends digest emails when new items are published. State i
 git clone https://github.com/amplibatu/rss-to-email.git
 cd rss-to-email
 npm install
-cp .env.example .env
-# Edit .env with your API credentials
-# Edit feeds.yml with your feeds
 ```
 
-## Configuration
+No `.env` needed for the script itself — email sending is handled by the agent via existing workspace scripts.
 
-### feeds.yml
+## Adding feeds
+
+Edit `feeds.yml`:
 
 ```yaml
 feeds:
@@ -28,36 +45,6 @@ feeds:
     enabled: false
 ```
 
-### .env
-
-| Variable | Description |
-|---|---|
-| `EMAIL_API_ENDPOINT` | Email sender API URL (required) |
-| `EMAIL_API_KEY` | API Bearer token (required) |
-| `EMAIL_RECIPIENT` | Recipient email (optional, depends on API) |
-
-## Usage
-
-```bash
-# Single run: check feeds, send digest if new items, commit state
-npm run check
-```
-
-## How it works
-
-1. Reads feed list from `feeds.yml`
-2. Fetches each feed and compares against `state.json` (last seen dates)
-3. On first run, records state without sending (avoids flooding)
-4. If new items found, sends a single HTML digest email
-5. Commits and pushes updated `state.json` back to the repo
-
-## Cron setup
-
-```bash
-# Check every 30 minutes
-*/30 * * * * cd /path/to/rss-to-email && /usr/bin/node src/index.js
-```
-
 ## State
 
-`state.json` tracks the last-seen date per feed URL. It's committed to the repo so state persists across machines. Reset by setting it to `{}` and pushing.
+`state.json` is committed to the repo — state persists across machines. Reset by pushing `{}`.

@@ -1,15 +1,13 @@
 {
   "name": "rss-to-email",
-  "version": "1.0.0",
-  "description": "RSS Feeds to Email bridge — checks feeds periodically and sends digest emails",
-  "main": "src/index.js",
+  "version": "2.0.0",
+  "description": "RSS Feeds to Email bridge — agent-driven digest with git state",
   "type": "module",
   "scripts": {
     "check": "node src/index.js"
   },
   "dependencies": {
-    "rss-parser": "^3.13.0",
-    "dotenv": "^16.4.7",
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.0",
+    "rss-parser": "^3.13.0"
   }
 }

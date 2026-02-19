@@ -1,0 +1,28 @@
+<!--
+  RSS Digest Email Template
+  
+  Used by the agent to generate consistent digest emails.
+  
+  Structure:
+  - Header with date and item count
+  - Items grouped by feed name
+  - Each item: linked title, date, summary snippet (max ~300 chars)
+  
+  Style: clean, readable, mobile-friendly
+-->
+
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 700px; margin: 0 auto; padding: 20px;">
+  <h1 style="border-bottom: 2px solid #333; padding-bottom: 10px;">📡 RSS Digest</h1>
+  <p style="color: #666;">{{DATE}} · {{COUNT}} new item{{PLURAL}}</p>
+
+  <!-- Repeat per feed group -->
+  <h2 style="color: #1a1a2e; margin-top: 30px;">{{FEED_NAME}}</h2>
+
+  <!-- Repeat per item -->
+  <div style="margin: 15px 0; padding: 12px; background: #f8f9fa; border-left: 3px solid #667eea; border-radius: 4px;">
+    <a href="{{LINK}}" style="color: #667eea; text-decoration: none; font-weight: 600; font-size: 16px;">{{TITLE}}</a>
+    <div style="color: #999; font-size: 12px; margin-top: 4px;">{{ITEM_DATE}}</div>
+    <div style="color: #444; font-size: 14px; margin-top: 8px; line-height: 1.5;">{{SUMMARY}}</div>
+  </div>
+
+</div>
