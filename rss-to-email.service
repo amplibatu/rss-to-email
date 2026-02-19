@@ -1,0 +1,16 @@
+[Unit]
+Description=RSS-to-Email Bridge
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=admin
+WorkingDirectory=/home/admin/rss-to-email
+ExecStart=/home/admin/.nvm/versions/node/v22.22.0/bin/node src/index.js
+Restart=on-failure
+RestartSec=60
+EnvironmentFile=/home/admin/rss-to-email/.env
+
+[Install]
+WantedBy=multi-user.target
