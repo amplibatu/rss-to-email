@@ -56,6 +56,8 @@ async function checkFeeds() {
         }))
         .sort((a, b) => ((b._date?.getTime() || 0) - (a._date?.getTime() || 0)));
 
+      // Use feed title from RSS, fall back to yml name
+      const feedName = parsed.title || feed.name || feed.url;
       const feedNewItems = [];
 
       for (const item of items) {
@@ -65,7 +67,7 @@ async function checkFeeds() {
         if (lastSeen && !itemDate) continue;
 
         feedNewItems.push({
-          feedName: feed.name,
+          feedName,
           title: item.title || '(no title)',
           link: item.link || '',
           date: item.isoDate || '',
@@ -81,11 +83,11 @@ async function checkFeeds() {
       if (!lastSeen && items.length > 0) {
         const newest = items[0]._date?.toISOString();
         if (newest) state[feed.url] = newest;
-        console.log(`[init] ${feed.name}: recorded state (${items.length} items)`);
+        console.log(`[init] ${feedName}: recorded state (${items.length} items)`);
       } else {
         allNewItems.push(...feedNewItems);
         if (newLastSeen) state[feed.url] = newLastSeen;
-        console.log(`[check] ${feed.name}: ${feedNewItems.length} new items`);
+        console.log(`[check] ${feedName}: ${feedNewItems.length} new items`);
       }
     } catch (err) {
       console.error(`[error] ${feed.name}: ${err.message}`);

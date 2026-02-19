@@ -1,5 +1,5 @@
 # RSS Feeds to monitor
+# name is optional (fallback if feed has no title)
 
 feeds:
-  - name: "AI Coding"
-    url: "https://aicoding.leaflet.pub/rss"
+  - url: "https://aicoding.leaflet.pub/rss"
