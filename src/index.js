@@ -15,7 +15,6 @@ const {
   EMAIL_API_ENDPOINT,
   EMAIL_API_KEY,
   EMAIL_RECIPIENT,
-  CHECK_INTERVAL = '30',
 } = process.env;
 
 if (!EMAIL_API_ENDPOINT || !EMAIL_API_KEY) {
@@ -188,15 +187,33 @@ function esc(s) {
     .replace(/"/g, '&quot;');
 }
 
+// --- Git state management ---
+
+async function commitAndPushState() {
+  const { execSync } = await import('child_process');
+  const opts = { cwd: ROOT, stdio: 'pipe' };
+
+  // Check if state.json changed
+  try {
+    execSync('git diff --quiet state.json', opts);
+    console.log('[git] No state changes to commit');
+    return;
+  } catch {
+    // diff found changes — continue
+  }
+
+  try {
+    execSync('git add state.json', opts);
+    execSync('git commit -m "Update feed state"', opts);
+    execSync('git push', opts);
+    console.log('[git] ✅ State committed and pushed');
+  } catch (err) {
+    console.error(`[git] Failed to push state: ${err.message}`);
+  }
+}
+
 // --- Main ---
 
-const runOnce = process.argv.includes('--once');
-
-console.log(`RSS-to-Email bridge started (interval: ${CHECK_INTERVAL}min, once: ${runOnce})`);
+console.log('RSS-to-Email bridge: checking feeds...');
 await checkFeeds();
-
-if (!runOnce) {
-  const intervalMs = parseInt(CHECK_INTERVAL) * 60 * 1000;
-  setInterval(() => checkFeeds(), intervalMs);
-  console.log(`Next check in ${CHECK_INTERVAL} minutes...`);
-}
+await commitAndPushState();

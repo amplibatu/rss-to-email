@@ -1,10 +1,12 @@
 # RSS-to-Email Bridge 📡
 
-Monitors RSS feeds and sends digest emails when new items are published.
+Monitors RSS feeds and sends digest emails when new items are published. State is stored in the repo itself (`state.json`) and committed back after each run.
 
 ## Setup
 
 ```bash
+git clone https://github.com/amplibatu/rss-to-email.git
+cd rss-to-email
 npm install
 cp .env.example .env
 # Edit .env with your API credentials
@@ -28,20 +30,16 @@ feeds:
 
 ### .env
 
-| Variable | Description | Default |
-|---|---|---|
-| `EMAIL_API_ENDPOINT` | Email sender API URL | required |
-| `EMAIL_API_KEY` | API Bearer token | required |
-| `EMAIL_RECIPIENT` | Recipient email (optional, depends on API) | — |
-| `CHECK_INTERVAL` | Minutes between checks | 30 |
+| Variable | Description |
+|---|---|
+| `EMAIL_API_ENDPOINT` | Email sender API URL (required) |
+| `EMAIL_API_KEY` | API Bearer token (required) |
+| `EMAIL_RECIPIENT` | Recipient email (optional, depends on API) |
 
 ## Usage
 
 ```bash
-# Run continuously (checks every CHECK_INTERVAL minutes)
-npm start
-
-# Single check (for cron/systemd timer)
+# Single run: check feeds, send digest if new items, commit state
 npm run check
 ```
 
@@ -51,16 +49,15 @@ npm run check
 2. Fetches each feed and compares against `state.json` (last seen dates)
 3. On first run, records state without sending (avoids flooding)
 4. If new items found, sends a single HTML digest email
-5. Waits and repeats
+5. Commits and pushes updated `state.json` back to the repo
 
-## Running as a service
+## Cron setup
 
 ```bash
-# systemd example
-sudo cp rss-to-email.service /etc/systemd/system/
-sudo systemctl enable --now rss-to-email
+# Check every 30 minutes
+*/30 * * * * cd /path/to/rss-to-email && /usr/bin/node src/index.js
 ```
 
 ## State
 
-`state.json` tracks the last-seen date per feed URL. Delete it to reset (next run will re-initialize without sending).
+`state.json` tracks the last-seen date per feed URL. It's committed to the repo so state persists across machines. Reset by setting it to `{}` and pushing.
